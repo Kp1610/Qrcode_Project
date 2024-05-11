@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #3bdebd;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            width: 100vw;
+            height: 100vh;
+            text-align:center;
+            background-image: url('/static/img1.jpg'); /* Update path as needed */
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        #qrcode {
+            margin-top: 20px;
+        }
+        #made-by {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+        .navlinks {
+            color: black;
+            text-decoration: none; /* Remove underline from links */
+        }
+        .navlinks:hover {
+            color: azure;
+        }
+        .qr-form {
+            align-content: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<div class="navbar">
+    <h2>QR Code Generator</h2>
+    <a class="navlinks" href="#">Home</a> | <a class="navlinks" href="#">About Me</a>
+</div>
+
+<form id="qr-form">
+    <input type="text" id="link" placeholder="Enter your link here to generate QR code" required>
+    <button type="submit">Generate QR Code</button>
+</form>
+<div id="qrcode"></div>
+<button id="saveBtn">Save</button> <!-- Button to save the QR code -->
+</div>
+
+<div id="made-by">
+    Made by Krutarth Pandya
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4"></script>
+<script>
+    document.getElementById('qr-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var link = document.getElementById('link').value;
+        if (link) {
+            fetch('/generate_qr?link=' + encodeURIComponent(link))
+            .then(response => response.blob())
+            .then(data => {
+                var qrImg = document.createElement('img');
+                qrImg.src = URL.createObjectURL(data);
+                document.getElementById('qrcode').innerHTML = '';
+                document.getElementById('qrcode').appendChild(qrImg);
+                // Enable Save button when QR code is generated
+                document.getElementById('saveBtn').disabled = false;
+            });
+        }
+    });
+
+    // Function to save the QR code as a JPG image
+    document.getElementById('saveBtn').addEventListener('click', function() {
+        var qrCodeImg = document.querySelector('#qrcode img');
+        var link = document.createElement('a');
+        link.download = 'qrcode.jpg';
+        link.href = qrCodeImg.src;
+        link.click();
+    });
+</script>
+
+</body>
+</html>
